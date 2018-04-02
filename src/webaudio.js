@@ -107,7 +107,15 @@ WebAudioOut.prototype.unlock = function(callback) {
 	var source = this.context.createBufferSource();
 	source.buffer = buffer;
 	source.connect(this.destination);
-	source.start(0);
+	if (source.start) {
+		source.start(0);
+	}
+	else {
+		source.noteOn(0);
+	}
+	if (source.context.state === 'suspended') {
+		source.context.resume();
+	}
 
 	setTimeout(this.checkIfUnlocked.bind(this, source, 0), 0);
 };
@@ -130,7 +138,7 @@ WebAudioOut.prototype.checkIfUnlocked = function(source, attempt) {
 };
 
 WebAudioOut.NeedsUnlocking = function() {
-	return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+	return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 };
 
 WebAudioOut.IsSupported = function() {
