@@ -67,8 +67,14 @@ WebAudioOut.prototype.play = function(sampleRate, left, right) {
 		this.startTime = now;
 		this.wallclockStartTime = JSMpeg.Now();
 	}
-
-	source.start(this.startTime);
+	if (source.start) {
+		source.start(this.startTime)
+	} else if (source.noteOn) {
+		source.noteOn(this.startTime)
+	} else {
+		new Error('WebAudioOut error #1')
+	}
+	// source.start(this.startTime);
 	this.startTime += duration;
 	this.wallclockStartTime += duration;
 };
@@ -109,13 +115,14 @@ WebAudioOut.prototype.unlock = function(callback) {
 	source.connect(this.destination);
 	if (source.start) {
 		source.start(0);
-	}
-	else {
+	} else if (source.noteOn) {
 		source.noteOn(0);
+	} else {
+		new Error('WebAudioOut error #1');
 	}
-	if (source.context.state === 'suspended') {
-		source.context.resume();
-	}
+	// if (source.context.state === 'suspended') {
+	// 	source.context.resume();
+	// }
 
 	setTimeout(this.checkIfUnlocked.bind(this, source, 0), 0);
 };
