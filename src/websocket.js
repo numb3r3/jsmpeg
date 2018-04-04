@@ -3,7 +3,7 @@ JSMpeg.Source.WebSocket = (function(){ "use strict";
 var WSSource = function(url, options) {
 	this.url = url;
 	this.options = options;
-	this.socket = null;	
+	this.socket = null;
 
 	this.callbacks = {connect: [], data: []};
 	this.destination = null;
@@ -34,7 +34,7 @@ WSSource.prototype.start = function() {
 	this.shouldAttemptReconnect = !!this.reconnectInterval;
 	this.progress = 0;
 	this.established = false;
-	
+
 	// this.socket = new WebSocket(this.url);
 	this.socket =  this.options.protocols ? new WebSocket(this.url, this.options.protocols) : new WebSocket(this.url);
 	this.socket.binaryType = 'arraybuffer';
@@ -57,15 +57,27 @@ WSSource.prototype.onClose = function() {
 	if (this.shouldAttemptReconnect) {
 		clearTimeout(this.reconnectTimeoutId);
 		this.reconnectTimeoutId = setTimeout(function(){
-			this.start();	
+			this.start();
 		}.bind(this), this.reconnectInterval*1000);
 	}
 };
 
+WSSource.prototype.cmd = function(cmdobj){
+};
+
 WSSource.prototype.onMessage = function(ev) {
-	if (this.destination) {
-		this.destination.write(ev.data);
-	}
+	// if (this.destination) {
+	// 	this.destination.write(ev.data);
+	// }
+
+	// borrowed codes from:
+	// https://github.com/miaooss/JsmpegDotNetLiveStreaming/blob/master/LiveStreamingWebRTC/html_src/js/playersource.js
+	if(typeof ev.data == "string") {
+        this.cmd(ev.data);
+    }
+  	else if (this.destination) {
+  		this.destination.write(ev.data);
+  	}
 };
 
 return WSSource;
