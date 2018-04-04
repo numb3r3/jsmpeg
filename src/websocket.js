@@ -62,22 +62,10 @@ WSSource.prototype.onClose = function() {
 	}
 };
 
-WSSource.prototype.cmd = function(cmdobj){
-};
-
 WSSource.prototype.onMessage = function(ev) {
-	// if (this.destination) {
-	// 	this.destination.write(ev.data);
-	// }
-
-	// borrowed codes from:
-	// https://github.com/miaooss/JsmpegDotNetLiveStreaming/blob/master/LiveStreamingWebRTC/html_src/js/playersource.js
-	if(typeof ev.data == "string") {
-        this.cmd(ev.data);
-    }
-  	else if (this.destination) {
-  		this.destination.write(ev.data);
-  	}
+	if (this.destination) {
+		this.destination.write(ev.data);
+	}
 };
 
 return WSSource;
